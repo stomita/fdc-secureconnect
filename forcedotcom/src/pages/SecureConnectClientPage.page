@@ -1,0 +1,87 @@
+<apex:page standardStylesheets="false"
+    showHeader="false"
+    contentType="text/html"
+><apex:outputText escape="false" value="<!DOCTYPE html>"/>
+<html>
+    <head>
+        <title>Secure Connect - Client</title>
+        <meta charset="utf-8" />
+        <script src="/soap/ajax/24.0/connection.js"></script>
+        <script>sforce.connection.sessionId='{!$Api.Session_ID}';</script>
+        <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/common/target/org/cometd.js')}" ></script>
+        <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/jquery-1.5.1.js')}"></script>
+        <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/json2.js')}"></script>
+        <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/jquery.cometd.js')}"></script>
+        <script src="{!$Resource.SecureConnectorJS}"></script>
+        <script>
+var client = new SecureConnector.Client();
+function hello() {
+    var username = $('#username').val();
+    var startTime = Date.now();
+    client.request("hello", username, function(err, code, message) {
+        var elapsed = Date.now() - startTime;
+        console.log("Elapsed time : " + elapsed + "msec");
+        alert(message);
+    });
+}
+        
+function query() {
+    var query = $('#query').val();
+    var startTime = Date.now();
+    client.request("query", query, function(err, code, data) {
+        console.log("response", code, data);
+        try {
+            var table = $('<table>');
+            $.each(data, function(i, row) {
+                if (i === 0) {
+                    var trh = $('<tr>');
+                    for (var field in row) {
+                       $('<th>').text(field).appendTo(trh);
+                    }
+                    trh.appendTo(table);
+                }
+                var tr = $('<tr>');
+                for (var field in row) {
+                   $('<td>').text(row[field] || '').appendTo(tr);
+                }
+                tr.appendTo(table);
+            });
+                
+            $('#queryResult').empty().append(table);
+        } catch (e) { console.log(e); }
+        var elapsed = Date.now() - startTime;
+        console.log("Elapsed time : " + elapsed + "msec");
+    });
+}
+/*    
+function capture() {
+    var startTime = Date.now();
+    client.request("capture", function(err, code, data) {
+        $('<img>').attr('src', data).appendTo($('#captureResult'));
+        var elapsed = Date.now() - startTime;
+        console.log("Elapsed time : " + elapsed + "msec");
+    });
+}
+*/
+        </script>
+    </head>
+    <body>
+        <h1>Secure Connect - Client</h1>
+        <div>
+            <input id="username" type="text" />
+            <input type="button" value="Hello" onclick="hello()" />
+        </div>
+        <div>
+            <input id="query" type="text" />
+            <input type="button" value="Query" onclick="query()" />
+            <div id="queryResult"></div>
+        </div>
+        <!--
+        <div>
+            <input type="button" value="Capture" onclick="capture()" />
+            <div id="captureResult"></div>
+        </div>
+        -->
+    </body>
+</html>
+</apex:page>

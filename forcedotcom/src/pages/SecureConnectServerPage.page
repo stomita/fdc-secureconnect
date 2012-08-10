@@ -1,0 +1,66 @@
+<apex:page standardStylesheets="false"
+    showHeader="false"
+    contentType="text/html"
+><apex:outputText escape="false" value="<!DOCTYPE html>"/>
+<html>
+<head>
+    <title>Secure Connect - Server</title>
+    <meta charset="utf-8" />
+    <script src="/soap/ajax/24.0/connection.js"></script>
+    <script>sforce.connection.sessionId='{!$Api.Session_ID}';</script>
+    <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/common/target/org/cometd.js')}" ></script>
+    <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/jquery-1.5.1.js')}"></script>
+    <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/json2.js')}"></script>
+    <script src="{!URLFOR($Resource.cometd, '/cometd-javascript/jquery/src/main/webapp/jquery/jquery.cometd.js')}"></script>
+    <script src="{!$Resource.SecureConnectorJS}"></script>
+    <script>
+$(function() {
+    var canvas = $('#canvas').get(0);
+    var ctx = canvas.getContext('2d');
+    var video = $('#camera').get(0);
+    var img = $('#shot').get(0);
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+    var URL = window.URL || window.webkitURL;
+    if (navigator.getUserMedia) {
+        navigator.getUserMedia({ video: true }, function(stream) {
+            $('#camera').attr('src', URL.createObjectURL(stream));
+       });
+    }
+    
+    var server = new SecureConnector.Server();
+    /*
+    server.addListener("hello", function(req, callback) {
+        callback.onSuccess("helloSuccess", "Hello, " + (req || "World"));
+    });
+    */    
+    server.addListener("capture", function(req, callback) {
+       ctx.drawImage(video, 0, 0, 320, 240);
+       var data = canvas.toDataURL("image/jpeg", 0.2);
+       img.src = data;
+       console.log("size: " + data.length);
+       callback.onSuccess("captureImage", data);
+    });
+
+});
+    
+</script>
+    
+<style>
+ #canvas, #camera {
+   width: 320px;
+   height: 240px;
+ }
+ #canvas {
+   display: none;
+ }
+    
+</style>
+  </head>
+  <body>
+    <h1>Secure Connect - Server</h1>
+    <video id="camera" autoplay="true" ></video>
+    <img id="shot" />
+    <canvas id="canvas" width="320" height="240"></canvas>
+  </body>
+</html>
+</apex:page>
