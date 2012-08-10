@@ -30,8 +30,8 @@ See the slides:
 
 <pre>
 $ cd nodejs/sql
-$ mysql test < deptemp.sql
-$ mysql test < crbilling.sql
+$ mysql test &lt; deptemp.sql
+$ mysql test &lt; crbilling.sql
 </pre>
 
 ### Startup SecureConnect resource server (Node.js) 
