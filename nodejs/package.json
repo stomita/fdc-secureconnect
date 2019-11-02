@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "async": "0.1.x",
-    "mysql": "0.9.x",
+    "mysql": "2.17.x",
     "node-salesforce": "0.3.x"
   }
 }
